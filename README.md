@@ -1,33 +1,17 @@
 # 说明
-AsyncHttpConnector是一个异步HTTP连接库，使用起来非常简单，只需要一两行代码就可以完成一个请求操作。
+AsyncHttpConnector是一个异步HTTP连接库，使用起来非常简单，只需要一两行代码就可以完成一个请求操作，并且轻松处理结果。
 
 ##特点
 - 支持HTTP和HTTPS
 - 支持GET和POST
 - 异步处理，回调操作运行在主线程
 
-# 快速使用
-以GET请求为例子，带参数的HTTPS请求：
+##更新说明
+2016年3月26日：
+- 修改错误的拼写
+- 修复www无法访问的问题
+- 重构代码
+- 使用Gradle构建
 
-```java
-//参数
-HashMap<String, String> params = new HashMap<String, String>();
-params.put("params", "value");
-
-//发送GET请求
-HttpConnector.easyGet("https://www.baidu.com", null,
-		new ResponseHandler() {
-
-			@Override
-			public void onSuccess(byte[] data) {
-				System.out.println(new String(data));
-			}
-
-			@Override
-			public void onFailure(int statusCode) {
-				System.out.println("error,status code:" + statusCode);
-			}
-			
-	});
-```
-**更多例子可以参考Sample部分**
+##使用方法
+可以参考app中的源码

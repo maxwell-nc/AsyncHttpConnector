@@ -1,51 +1,81 @@
 package pres.nc.maxwell.asynchttp.conn;
 
+import android.os.AsyncTask;
+import android.util.Log;
+
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 
+import pres.nc.maxwell.asynchttp.callback.ResultCallback;
+import pres.nc.maxwell.asynchttp.log.LogUtils;
 import pres.nc.maxwell.asynchttp.request.Request;
 import pres.nc.maxwell.asynchttp.response.Response;
-import pres.nc.maxwell.asynchttp.handler.ResultHandler;
-
-import android.os.AsyncTask;
 
 /**
  * 连接任务
  */
-public class ConnectTask extends AsyncTask<Request, Void, Boolean> {
+public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
+
+    /**
+     * 日志标记，为null则不打印日志
+     */
+    private String logTag;
+
+    /**
+     * 请求信息
+     */
+    private final Request request;
 
     /**
      * 结果处理器
      */
-    private ResultHandler resultHandler;
+    private ResultCallback resultCallback;
 
     /**
      * 响应信息
      */
     private Response response = new Response();
 
+
     /**
      * 创建连接任务
      *
-     * @param connHandler 结果处理器
+     * @param resultCallback 结果回调
+     * @param request
+     * @param logTag
      */
-    public ConnectTask(ResultHandler connHandler) {
-        this.resultHandler = connHandler;
+    public ConnectTask(ResultCallback resultCallback, Request request, String logTag) {
+        this.resultCallback = resultCallback;
+        this.request = request;
+        this.logTag = logTag;
     }
 
     @Override
     protected void onPreExecute() {//主线程
-        resultHandler.onPrepared();
+
+        //TODO:可以取消任务
+
+        if (logTag != null) {
+            LogUtils.log()
+                    .tag(logTag)
+                    .priority(Log.INFO)
+                    .addMsg("Request: " + request.toString())
+                    .addMsg("RequestMethod: "+ request.getRequestMethod())
+                    .build()
+                    .execute();
+        }
+
+        resultCallback.onPrepared(request);
     }
 
     @Override
-    protected Boolean doInBackground(Request... params) {// 子线程
+    protected Boolean doInBackground(Void... params) {// 子线程
 
         HttpURLConnection urlConnection = null;
 
         try {
 
-            urlConnection = URLConnection.getURLConnection(params[0]);
+            urlConnection = URLConnection.getURLConnection(request);
 
             if (urlConnection == null) {
                 return false;
@@ -59,9 +89,9 @@ public class ConnectTask extends AsyncTask<Request, Void, Boolean> {
                 InputStream inputStream = urlConnection.getInputStream();
 
                 // 调用监听器
-                if (resultHandler != null) {
+                if (resultCallback != null) {
                     response.setResponseMsg(urlConnection.getResponseMessage());
-                    response.setResponseData(resultHandler.parseResponseStream(inputStream));
+                    response.setResponseData(resultCallback.parseResponseStream(inputStream));
                 }
                 return true;
             }
@@ -82,12 +112,34 @@ public class ConnectTask extends AsyncTask<Request, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean result) {// 主线程
 
-        if (resultHandler != null) {
+        if (resultCallback != null) {
 
             if (result) {// 成功接收
-                resultHandler.onSuccess(response);
+
+                if (logTag != null) {
+                    LogUtils.log()
+                            .tag(logTag)
+                            .priority(Log.INFO)
+                            .addMsg("Request Success")
+                            .addMsg("Response Message: " + response.getResponseMsg())
+                            .build()
+                            .execute();
+                }
+                resultCallback.onSuccess(response);
+
             } else {// 接收失败
-                resultHandler.onFailure(response);
+
+                if (logTag != null) {
+                    LogUtils.log()
+                            .tag(logTag)
+                            .priority(Log.WARN)
+                            .addMsg("Request Failed")
+                            .addMsg("Error code: " + response.getResponseCode())
+                            .addMsg("Error Msg: " + response.getResponseMsg())
+                            .build()
+                            .execute();
+                }
+                resultCallback.onFailure(response);
             }
 
         }

@@ -48,23 +48,31 @@ public class Request implements Serializable {
      */
     private String userAgent = Constant.USERAGENT_DEFALUT;
 
-    public Request() {
+    /**
+     * 不要直接创建Request
+     * @see #createGetRequest
+     * @see #createPostRequest
+     */
+    private Request() {}
+
+    /**
+     * 创建GET请求
+     * @return GET请求
+     */
+    public static Request createGetRequest(){
+        Request request = new Request();
+        request.setRequestMethod(Constant.METHOD_GET);
+        return request;
     }
 
     /**
-     * @param URL 地址
+     * 创建POST请求
+     * @return POST请求
      */
-    public Request(String URL) {
-        this.URL = URL;
-    }
-
-    /**
-     * @param URL 地址
-     * @param params 请求参数
-     */
-    public Request(String URL, HashMap<String, Object> params) {
-        this.URL = URL;
-        this.params = params;
+    public static Request createPostRequest(){
+        Request request = new Request();
+        request.setRequestMethod(Constant.METHOD_POST);
+        return request;
     }
 
     /**

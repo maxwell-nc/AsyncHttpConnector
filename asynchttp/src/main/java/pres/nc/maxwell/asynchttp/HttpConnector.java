@@ -1,8 +1,10 @@
 package pres.nc.maxwell.asynchttp;
 
+import android.content.Context;
+
 import java.util.HashMap;
 
-import pres.nc.maxwell.asynchttp.callback.ResultCallback;
+import pres.nc.maxwell.asynchttp.callback.ICallback;
 import pres.nc.maxwell.asynchttp.conn.ConnectTask;
 import pres.nc.maxwell.asynchttp.request.Request;
 import pres.nc.maxwell.asynchttp.thread.ThreadPoolController;
@@ -11,6 +13,11 @@ import pres.nc.maxwell.asynchttp.thread.ThreadPoolController;
  * HTTP连接器
  */
 public class HttpConnector {
+
+    /**
+     * 一小时
+     */
+    public static final long CACHE_TIME_AN_HOUR = 3600000L;
 
     /**
      * 构建器
@@ -29,7 +36,7 @@ public class HttpConnector {
             return;
         }
 
-        ConnectTask connectTask = new ConnectTask(mBuilder.resultCallback, mBuilder.request, mBuilder.logTag);
+        ConnectTask connectTask = new ConnectTask(mBuilder.resultCallback, mBuilder.request, mBuilder.logTag, mBuilder.isCache, mBuilder.context, mBuilder.cacheTime);
         connectTask.executeOnExecutor(ThreadPoolController.getThreadPool());
     }
 
@@ -66,7 +73,7 @@ public class HttpConnector {
         /**
          * 结果回调
          */
-        ResultCallback resultCallback;
+        ICallback resultCallback;
 
         /**
          * 请求信息
@@ -77,6 +84,21 @@ public class HttpConnector {
          * 构建生成的
          */
         HttpConnector httpConnector;
+
+        /**
+         * 是否使用缓存
+         */
+        boolean isCache = false;
+
+        /**
+         * 缓存时间，毫秒
+         */
+        long cacheTime;
+
+        /**
+         * 上下文，用于获取缓存目录
+         */
+        Context context;//TODO:想办法取缔
 
         Builder(Request request) {
             this.request = request;
@@ -130,8 +152,23 @@ public class HttpConnector {
          * @param resultCallback 结果回调
          * @return 构建器
          */
-        public Builder callback(ResultCallback resultCallback) {
+        public Builder callback(ICallback resultCallback) {
             this.resultCallback = resultCallback;
+            return this;
+        }
+
+        /**
+         * 使用缓存
+         *
+         * @param context   上下文
+         * @param cacheTime 缓存时间，毫秒
+         * @return 构建器
+         * @see #CACHE_TIME_AN_HOUR
+         */
+        public Builder cache(Context context, long cacheTime) {
+            this.context = context;
+            this.cacheTime = cacheTime;
+            this.isCache = true;
             return this;
         }
 

@@ -8,22 +8,25 @@ import pres.nc.maxwell.asynchttp.response.Response;
 /**
  * Response接口模型
  */
-public interface ResultCallback<T> {
+public interface ICallback<T> {
 
     /**
      * 请求准备操作，主线程
+     *
      * @param request 请求信息
      */
     void onPrepared(Request request);
 
     /**
      * 成功请求时操作，主线程
+     *
      * @param response 响应信息
      */
     void onSuccess(Response<T> response);
 
     /**
      * 请求失败时操作，主线程
+     *
      * @param response 响应信息
      */
     void onFailure(Response<T> response);
@@ -35,4 +38,12 @@ public interface ResultCallback<T> {
      * @return 特定类型数据
      */
     T parseResponseStream(InputStream is);
+
+    /**
+     * 转换成缓存
+     *
+     * @param data 数据
+     * @return 缓存
+     */
+    String toCache(T data);
 }

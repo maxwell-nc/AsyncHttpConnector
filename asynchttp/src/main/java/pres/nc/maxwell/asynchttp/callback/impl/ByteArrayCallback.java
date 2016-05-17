@@ -3,7 +3,7 @@ package pres.nc.maxwell.asynchttp.callback.impl;
 import java.io.IOException;
 import java.io.InputStream;
 
-import pres.nc.maxwell.asynchttp.callback.ResultCallback;
+import pres.nc.maxwell.asynchttp.callback.ICallback;
 import pres.nc.maxwell.asynchttp.io.IOUtils;
 import pres.nc.maxwell.asynchttp.request.Request;
 import pres.nc.maxwell.asynchttp.response.Response;
@@ -11,26 +11,33 @@ import pres.nc.maxwell.asynchttp.response.Response;
 /**
  * 字节数组回调
  */
-public abstract class ByteArrayCallback implements ResultCallback<byte[]> {
+public abstract class ByteArrayCallback implements ICallback<byte[]> {
 
-	@Override
-	public void onPrepared(Request request) {}
+    @Override
+    public void onPrepared(Request request) {
+    }
 
-	@Override
-	public void onSuccess(Response<byte[]> response) {}
+    @Override
+    public void onSuccess(Response<byte[]> response) {
+    }
 
-	@Override
-	public void onFailure(Response<byte[]> response) {}
+    @Override
+    public void onFailure(Response<byte[]> response) {
+    }
 
-	public byte[] parseResponseStream(InputStream is) {
+    public byte[] parseResponseStream(InputStream is) {
 
-		try {
-			return IOUtils.inputstream2bytes(is);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        try {
+            return IOUtils.inputStream2bytes(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-		return null;
-	}
+        return null;
+    }
 
+    @Override
+    public String toCache(byte[] data) {
+        return new String(data);
+    }
 }

@@ -1,12 +1,15 @@
 package pres.nc.maxwell.asynchttp.conn;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 
-import pres.nc.maxwell.asynchttp.callback.ResultCallback;
+import pres.nc.maxwell.asynchttp.cache.CacheManager;
+import pres.nc.maxwell.asynchttp.callback.ICallback;
 import pres.nc.maxwell.asynchttp.log.LogUtils;
 import pres.nc.maxwell.asynchttp.request.Request;
 import pres.nc.maxwell.asynchttp.response.Response;
@@ -15,6 +18,11 @@ import pres.nc.maxwell.asynchttp.response.Response;
  * 连接任务
  */
 public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
+
+    /**
+     * 缓存管理，为null则不缓存
+     */
+    private CacheManager mCacheManager;
 
     /**
      * 日志标记，为null则不打印日志
@@ -29,25 +37,25 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
     /**
      * 结果处理器
      */
-    private ResultCallback resultCallback;
+    private ICallback resultCallback;
 
     /**
      * 响应信息
      */
     private Response response = new Response();
 
-
     /**
      * 创建连接任务
-     *
-     * @param resultCallback 结果回调
-     * @param request
-     * @param logTag
      */
-    public ConnectTask(ResultCallback resultCallback, Request request, String logTag) {
+    public ConnectTask(ICallback resultCallback, Request request, String logTag,
+                       boolean isCache, Context context, long cacheTime) {
         this.resultCallback = resultCallback;
         this.request = request;
         this.logTag = logTag;
+
+        if (isCache) {
+            mCacheManager = new CacheManager(context, cacheTime);
+        }
     }
 
     @Override
@@ -60,7 +68,7 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
                     .tag(logTag)
                     .priority(Log.INFO)
                     .addMsg("Request: " + request.toString())
-                    .addMsg("RequestMethod: "+ request.getRequestMethod())
+                    .addMsg("RequestMethod: " + request.getRequestMethod())
                     .build()
                     .execute();
         }
@@ -70,6 +78,16 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {// 子线程
+
+        if (mCacheManager != null) {
+            String cache = mCacheManager.getCache(request.getURL());
+            if (cache != null) {
+                response.setResponseCode(-200);//区分是否冲缓存读取的
+                response.setResponseMsg("读取缓存成功！");
+                response.setResponseData(resultCallback.parseResponseStream(new ByteArrayInputStream(cache.getBytes())));
+                return true;
+            }
+        }
 
         HttpURLConnection urlConnection = null;
 
@@ -125,7 +143,20 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
                             .build()
                             .execute();
                 }
+
                 resultCallback.onSuccess(response);
+
+                //写缓存
+                if (mCacheManager != null) {
+                    if (response.getResponseCode() != -200) {//非缓存数据
+                        new Thread(){
+                            @Override
+                            public void run() {
+                                mCacheManager.setCache(request.getURL(), resultCallback.toCache(response.getResponseData()));
+                            }
+                        }.start();
+                    }
+                }
 
             } else {// 接收失败
 

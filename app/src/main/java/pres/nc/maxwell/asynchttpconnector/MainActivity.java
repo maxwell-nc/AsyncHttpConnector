@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
         HttpConnector.get("https://www.baidu.com")
                 .addParams("params", "value")//参数
+                .cache(this,HttpConnector.CACHE_TIME_AN_HOUR)
                 .log("YourLogTag")//打印日志的标记，不设置则不打印
                 .callback(new StringCallback() {
 

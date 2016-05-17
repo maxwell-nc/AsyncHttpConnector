@@ -36,19 +36,21 @@ public class HttpConnector {
     /**
      * 发起GET请求
      *
+     * @param url 请求地址
      * @return 构建器
      */
-    public static Builder get() {
-        return new Builder(Request.createGetRequest());
+    public static Builder get(String url) {
+        return new Builder(Request.createGetRequest(url));
     }
 
     /**
      * 发起POST请求
      *
+     * @param url 请求地址
      * @return 构建器
      */
-    public static Builder post() {
-        return new Builder(Request.createPostRequest());
+    public static Builder post(String url) {
+        return new Builder(Request.createPostRequest(url));
     }
 
     /**
@@ -71,22 +73,18 @@ public class HttpConnector {
          */
         Request request;
 
+        /**
+         * 构建生成的
+         */
+        HttpConnector httpConnector;
+
         Builder(Request request) {
             this.request = request;
         }
 
         /**
-         * 设置请求地址
-         * @param url 请求地址
-         * @return 构建器
-         */
-        public Builder url(String url) {
-            request.setURL(url);
-            return this;
-        }
-
-        /**
          * 设置参数Map，注意此方法必须在{@link #addParams(String, Object)}之前调用，否则会丢失参数
+         *
          * @param params
          * @return
          */
@@ -100,13 +98,14 @@ public class HttpConnector {
 
         /**
          * 添加参数
-         * @param key 参数名
+         *
+         * @param key   参数名
          * @param value 参数值
          * @return 构建器
          */
         public Builder addParams(String key, Object value) {
             HashMap<String, Object> params = request.getParams();
-            if (params == null){
+            if (params == null) {
                 params = new HashMap<>();
             }
             params.put(key, value);
@@ -116,6 +115,7 @@ public class HttpConnector {
 
         /**
          * 设置日志信息标记，不设置则不打印日志
+         *
          * @param tag 日志标记
          * @return 构建器
          */
@@ -126,6 +126,7 @@ public class HttpConnector {
 
         /**
          * 设置回调
+         *
          * @param resultCallback 结果回调
          * @return 构建器
          */
@@ -136,10 +137,23 @@ public class HttpConnector {
 
         /**
          * 构建连接器
+         *
          * @return 连接器
          */
         public HttpConnector build() {
-            return new HttpConnector(this);
+            httpConnector = new HttpConnector(this);
+            return httpConnector;
+        }
+
+        /**
+         * 加载
+         */
+        public void load() {
+            if (httpConnector != null) {
+                httpConnector.execute();
+            } else {
+                new HttpConnector(this).execute();
+            }
         }
 
     }

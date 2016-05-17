@@ -50,27 +50,35 @@ public class Request implements Serializable {
 
     /**
      * 不要直接创建Request
+     *
      * @see #createGetRequest
      * @see #createPostRequest
      */
-    private Request() {}
+    private Request() {
+    }
 
     /**
      * 创建GET请求
+     *
+     * @param url 请求地址
      * @return GET请求
      */
-    public static Request createGetRequest(){
+    public static Request createGetRequest(String url) {
         Request request = new Request();
+        request.setURL(url);
         request.setRequestMethod(Constant.METHOD_GET);
         return request;
     }
 
     /**
      * 创建POST请求
+     *
+     * @param url 请求地址
      * @return POST请求
      */
-    public static Request createPostRequest(){
+    public static Request createPostRequest(String url) {
         Request request = new Request();
+        request.setURL(url);
         request.setRequestMethod(Constant.METHOD_POST);
         return request;
     }

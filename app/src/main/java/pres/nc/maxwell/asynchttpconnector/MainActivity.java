@@ -20,9 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void test() {
 
-        HttpConnector
-                .get()
-                .url("https://www.baidu.com")
+        HttpConnector.get("https://www.baidu.com")
                 .addParams("params", "value")//参数
                 .log("YourLogTag")//打印日志的标记，不设置则不打印
                 .callback(new StringCallback() {
@@ -33,8 +31,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 })
-                .build()
-                .execute();
+                .load();
 
     }
 }

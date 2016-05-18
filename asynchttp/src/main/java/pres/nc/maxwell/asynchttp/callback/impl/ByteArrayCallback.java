@@ -9,7 +9,7 @@ import pres.nc.maxwell.asynchttp.io.IOUtils;
  */
 public abstract class ByteArrayCallback extends AbsCallback<byte[]> {
 
-    public byte[] parseResponseStream(InputStream is) throws Exception {
+    public byte[] parseResponseStream(InputStream is, int contentLength) throws Exception {
         return IOUtils.inputStream2bytes(is);
     }
 

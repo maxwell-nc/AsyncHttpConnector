@@ -92,7 +92,8 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
                 response.setResponseCode(-200);//区分是否冲缓存读取的
                 response.setResponseMsg("读取缓存成功！");
                 try {
-                    response.setResponseData(resultCallback.parseResponseStream(new ByteArrayInputStream(cache.getBytes())));
+                    //这里的contentLength没有意义，因为文件不做缓存
+                    response.setResponseData(resultCallback.parseResponseStream(new ByteArrayInputStream(cache.getBytes()), 1));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -125,10 +126,14 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
                 if ("gzip".equals(urlConnection.getContentEncoding())) {
                     inputStream = new GZIPInputStream(inputStream);
                 }
+
+                //内容大小
+                int contentLength = urlConnection.getContentLength();
+
                 // 调用监听器
                 if (resultCallback != null) {
                     response.setResponseMsg(urlConnection.getResponseMessage());
-                    response.setResponseData(resultCallback.parseResponseStream(inputStream));
+                    response.setResponseData(resultCallback.parseResponseStream(inputStream, contentLength));
                 }
                 return true;
             }

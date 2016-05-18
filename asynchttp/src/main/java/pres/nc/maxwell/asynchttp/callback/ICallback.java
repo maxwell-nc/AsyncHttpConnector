@@ -43,9 +43,10 @@ public interface ICallback<T> {
      * 解析响应输入流，子线程
      *
      * @param is 输入流
+     * @param contentLength
      * @return 特定类型数据
      */
-    T parseResponseStream(InputStream is) throws Exception;
+    T parseResponseStream(InputStream is, int contentLength) throws Exception;
 
     /**
      * 转换成缓存

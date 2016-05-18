@@ -10,7 +10,7 @@ import pres.nc.maxwell.asynchttp.io.IOUtils;
 public abstract class StringCallback extends AbsCallback<String> {
 
     @Override
-    public String parseResponseStream(InputStream is) throws Exception {
+    public String parseResponseStream(InputStream is, int contentLength) throws Exception {
         return new String(IOUtils.inputStream2bytes(is));
     }
 

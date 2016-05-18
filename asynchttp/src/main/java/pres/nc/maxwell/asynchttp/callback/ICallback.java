@@ -1,5 +1,6 @@
 package pres.nc.maxwell.asynchttp.callback;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import pres.nc.maxwell.asynchttp.request.Request;
@@ -37,7 +38,7 @@ public interface ICallback<T> {
      * @param is 输入流
      * @return 特定类型数据
      */
-    T parseResponseStream(InputStream is);
+    T parseResponseStream(InputStream is) throws IOException;
 
     /**
      * 转换成缓存

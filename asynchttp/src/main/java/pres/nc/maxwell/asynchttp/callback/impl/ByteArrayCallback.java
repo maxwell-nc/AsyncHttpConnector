@@ -25,15 +25,8 @@ public abstract class ByteArrayCallback implements ICallback<byte[]> {
     public void onFailure(Response<byte[]> response) {
     }
 
-    public byte[] parseResponseStream(InputStream is) {
-
-        try {
-            return IOUtils.inputStream2bytes(is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    public byte[] parseResponseStream(InputStream is) throws IOException {
+        return IOUtils.inputStream2bytes(is);
     }
 
     @Override

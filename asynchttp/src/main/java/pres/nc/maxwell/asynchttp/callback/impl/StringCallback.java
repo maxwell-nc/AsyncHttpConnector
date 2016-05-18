@@ -26,15 +26,8 @@ public abstract class StringCallback implements ICallback<String> {
     }
 
     @Override
-    public String parseResponseStream(InputStream is) {
-
-        try {
-            return new String(IOUtils.inputStream2bytes(is));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    public String parseResponseStream(InputStream is) throws IOException {
+        return new String(IOUtils.inputStream2bytes(is));
     }
 
     @Override

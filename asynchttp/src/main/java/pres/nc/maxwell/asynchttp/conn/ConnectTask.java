@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.zip.GZIPInputStream;
@@ -91,7 +92,11 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
             if (cache != null) {
                 response.setResponseCode(-200);//区分是否冲缓存读取的
                 response.setResponseMsg("读取缓存成功！");
-                response.setResponseData(resultCallback.parseResponseStream(new ByteArrayInputStream(cache.getBytes())));
+                try {
+                    response.setResponseData(resultCallback.parseResponseStream(new ByteArrayInputStream(cache.getBytes())));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return true;
             }
         }
@@ -132,6 +137,9 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
 
         } catch (Exception e) {
             e.printStackTrace();
+            response.setResponseCode(-999);
+            response.setResponseMsg("请求异常退出！");
+            return false;
         } finally {
 
             if (urlConnection != null) {

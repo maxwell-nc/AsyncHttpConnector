@@ -13,7 +13,21 @@ AsyncHttpConnector是一个异步HTTP连接库，使用起来非常简单，只�
 
 ##使用方法
 
-
+添加jitpack仓库:
+```groovy
+	allprojects {
+		repositories {
+			...
+			maven { url "https://jitpack.io" }
+		}
+	}
+```
+添加Gradle依赖：
+```groovy
+	dependencies {
+	        compile 'com.github.maxwell-nc:AsyncHttpConnector:v2.0'
+	}
+```
 基本使用方法：
 
 ```java

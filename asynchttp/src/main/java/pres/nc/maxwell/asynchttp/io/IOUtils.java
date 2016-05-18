@@ -96,4 +96,30 @@ public class IOUtils {
         return ret;
     }
 
+    /**
+     * 删除目录下的文件，非递归，遇到目录不删除
+     *
+     * @param dirFile
+     *            目录File对象
+     * @return 是否成功删除
+     */
+    public static boolean removeDir(File dirFile) {
+
+        if (!dirFile.isDirectory()) {
+            return false;
+        }
+        File files[] = dirFile.listFiles();
+        for (int i = 0; i < files.length; i++) {
+
+            if (files[i].isDirectory()) {
+                break;
+            }
+
+            if (!files[i].delete()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

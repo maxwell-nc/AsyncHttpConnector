@@ -16,8 +16,7 @@ public class MemoryCache implements ICache {
         mMemoryCache = new LruCache<String, String>((int) maxCacheMemory) {
             @Override
             protected int sizeOf(String key, String value) {
-                int bytes = value.getBytes().length;
-                return bytes;
+                return value.getBytes().length;
             }
         };
     }
@@ -41,5 +40,21 @@ public class MemoryCache implements ICache {
         if (cache != null) {
             mMemoryCache.put(key, cache);
         }
+    }
+
+    @Override
+    public boolean clearCache(String key) {
+        String remove = mMemoryCache.remove(key);
+        if (remove != null) {
+            remove = null;//回收
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean clearCache() {
+        mMemoryCache.evictAll();
+        return true;
     }
 }

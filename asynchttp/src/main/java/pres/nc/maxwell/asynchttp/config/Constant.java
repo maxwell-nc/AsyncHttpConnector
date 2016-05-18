@@ -1,4 +1,4 @@
-package pres.nc.maxwell.asynchttp.utils;
+package pres.nc.maxwell.asynchttp.config;
 
 /**
  * 常量类

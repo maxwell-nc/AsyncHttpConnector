@@ -45,16 +45,22 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
     private Response response = new Response();
 
     /**
+     * 是否启用网络
+     */
+    private final boolean isEnableNetwork;
+
+    /**
      * 创建连接任务
      */
     public ConnectTask(ICallback resultCallback, Request request, String logTag,
-                       boolean isCache, Context context, long cacheTime) {
+                       boolean isCache, Context context, long cacheTime, boolean isEnableNetwork) {
         this.resultCallback = resultCallback;
         this.request = request;
         this.logTag = logTag;
+        this.isEnableNetwork = isEnableNetwork;
 
         if (isCache) {
-            mCacheManager = new CacheManager(context, cacheTime);
+            mCacheManager = new CacheManager(context, request.getURL(), cacheTime);
         }
     }
 
@@ -80,13 +86,19 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
     protected Boolean doInBackground(Void... params) {// 子线程
 
         if (mCacheManager != null) {
-            String cache = mCacheManager.getCache(request.getURL());
+            String cache = mCacheManager.getCache();
             if (cache != null) {
                 response.setResponseCode(-200);//区分是否冲缓存读取的
                 response.setResponseMsg("读取缓存成功！");
                 response.setResponseData(resultCallback.parseResponseStream(new ByteArrayInputStream(cache.getBytes())));
                 return true;
             }
+        }
+
+        if (!isEnableNetwork) {
+            response.setResponseCode(-404);//区分普通错误
+            response.setResponseMsg("读取缓存失败并且没有启用网络请求！");
+            return false;
         }
 
         HttpURLConnection urlConnection = null;
@@ -149,10 +161,10 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
                 //写缓存
                 if (mCacheManager != null) {
                     if (response.getResponseCode() != -200) {//非缓存数据
-                        new Thread(){
+                        new Thread() {
                             @Override
                             public void run() {
-                                mCacheManager.setCache(request.getURL(), resultCallback.toCache(response.getResponseData()));
+                                mCacheManager.setCache(resultCallback.toCache(response.getResponseData()));
                             }
                         }.start();
                     }

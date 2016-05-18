@@ -15,4 +15,13 @@ public interface ICache {
      */
     void setCache(String key, String cache);
 
+    /**
+     * 清除指定缓存
+     */
+    boolean clearCache(String key);
+
+    /**
+     * 清除所有缓存
+     */
+    boolean clearCache();
 }

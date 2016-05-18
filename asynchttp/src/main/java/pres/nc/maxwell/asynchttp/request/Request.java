@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import pres.nc.maxwell.asynchttp.conn.URLParser;
-import pres.nc.maxwell.asynchttp.utils.Constant;
+import pres.nc.maxwell.asynchttp.config.Constant;
 
 /**
  * 请求
@@ -26,25 +26,25 @@ public class Request implements Serializable {
     /**
      * 请求方法，默认为GET
      *
-     * @see pres.nc.maxwell.asynchttp.utils.Constant#METHOD_GET
-     * @see pres.nc.maxwell.asynchttp.utils.Constant#METHOD_POST
+     * @see pres.nc.maxwell.asynchttp.config.Constant#METHOD_GET
+     * @see pres.nc.maxwell.asynchttp.config.Constant#METHOD_POST
      */
     private String requestMethod = Constant.METHOD_GET;
 
     /**
-     * 连接超时时间,默认为2000ms
+     * 连接超时时间
      */
-    private int connectTimeout = 2000;
+    private int connectTimeout = -1;
 
     /**
-     * 读取超时时间,默认为10000ms
+     * 读取超时时间
      */
-    private int readTimeout = 10000;
+    private int readTimeout = -1;
 
     /**
      * 用户代理
      *
-     * @see pres.nc.maxwell.asynchttp.utils.Constant#USERAGENT_DEFALUT
+     * @see pres.nc.maxwell.asynchttp.config.Constant#USERAGENT_DEFALUT
      */
     private String userAgent = Constant.USERAGENT_DEFALUT;
 

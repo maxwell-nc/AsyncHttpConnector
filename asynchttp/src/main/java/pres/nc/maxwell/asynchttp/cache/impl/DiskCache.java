@@ -1,10 +1,10 @@
 package pres.nc.maxwell.asynchttp.cache.impl;
 
-import android.content.Context;
 import android.os.Environment;
 
 import java.io.File;
 
+import pres.nc.maxwell.asynchttp.cache.CacheManager;
 import pres.nc.maxwell.asynchttp.cache.ICache;
 import pres.nc.maxwell.asynchttp.io.IOUtils;
 
@@ -13,16 +13,10 @@ import pres.nc.maxwell.asynchttp.io.IOUtils;
  */
 public class DiskCache implements ICache {
 
-    private final Context context;
+    private final CacheManager cacheManager;
 
-    /**
-     * 缓存时间
-     */
-    private final long cacheTime;
-
-    public DiskCache(Context context, long cacheTime) {
-        this.context = context;
-        this.cacheTime = cacheTime;
+    public DiskCache(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
     }
 
     @Override
@@ -38,11 +32,18 @@ public class DiskCache implements ICache {
         //缓存经历时间
         long cacheSpend = System.currentTimeMillis() - modiTime;
 
-        if (cacheSpend > cacheTime) {//失效
+        if (cacheSpend > cacheManager.getCacheTime()) {//失效
+            clearCache(key);
             return null;
         }
 
         return IOUtils.loadFileToString(file);
+    }
+
+    @Override
+    public boolean clearCache(String key) {
+        File file = new File(getLocalCachePath(), key);
+        return file.exists() && file.delete();
     }
 
     @Override
@@ -63,15 +64,17 @@ public class DiskCache implements ICache {
                 .getExternalStorageState())
                 || !Environment.isExternalStorageRemovable()) {
 
-            File externalCacheDir = context.getExternalCacheDir();
+            File externalCacheDir = cacheManager.getContext().getExternalCacheDir();
             if (externalCacheDir != null) {
                 cachePath = externalCacheDir.getPath();
             }
         }
 
         if (cachePath == null) {
-            cachePath = context.getCacheDir().getPath();
+            cachePath = cacheManager.getContext().getCacheDir().getPath();
         }
+
+        cachePath += "/httpcache";
 
         // 如果文件夹不存在, 创建文件夹
         File dirFile = new File(cachePath);
@@ -81,5 +84,10 @@ public class DiskCache implements ICache {
         }
 
         return cachePath;
+    }
+
+    @Override
+    public boolean clearCache() {
+        return IOUtils.removeDir(new File(getLocalCachePath()));
     }
 }

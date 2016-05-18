@@ -14,16 +14,37 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        test();
+        init();
+        getSample();
     }
 
-    private void test() {
+    public void init() {
 
-        HttpConnector.get("https://www.baidu.com")
+        //HttpConnector.clearCache(this);//清除所有缓存
+
+        HttpConnector.globalConfig(this)
+                .setDefaultConnectTimeout(10000)//默认连接超时时间（毫秒），这里是10秒
+                .setDefaultReadTimeout(15000)//默认读取超时时间（毫秒），这里是15秒
+                .setDefaultCacheTime(3600000L)//默认缓存时间（毫秒），这里是1小时
+                //.onlyCache()//只读取缓存，不请求网络
+                .config();
+
+    }
+
+    public void getSample() {
+
+        String url = "https://www.baidu.com";
+
+        //HttpConnector.clearCache(this,url);//清除指定缓存
+
+        HttpConnector.get(url)
                 .addParams("params", "value")//参数
-                .cache(this,HttpConnector.CACHE_TIME_AN_HOUR)
-                .log("YourLogTag")//打印日志的标记，不设置则不打印
+                .log("tag")//打印日志的标记，不设置则不打印
+                .cache()//使用缓存,使用这个方法必须配置过全局属性
+                //.cache(3600000L)//使用缓存,使用这个方法必须配置过全局属性,独立的缓存时间
+                //.cache(this,3600000L)//使用缓存,独立的缓存时间
+                //.setConnectTimeout(10000)//独立的连接超时时间
+                //.setReadTimeout(15000)//独立的读取超时时间
                 .callback(new StringCallback() {
 
                     @Override
@@ -35,5 +56,6 @@ public class MainActivity extends AppCompatActivity {
                 .load();
 
     }
+
 }
 

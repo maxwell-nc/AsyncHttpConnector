@@ -21,9 +21,21 @@ public class CacheManager {
      */
     private final long cacheTime;
 
-    public CacheManager(Context context, long cacheTime) {
+    private String key;
+
+    public Context getContext() {
+        return context;
+    }
+
+    public long getCacheTime() {
+        return cacheTime;
+    }
+
+    public CacheManager(Context context, String url, long cacheTime) {
         this.context = context;
         this.cacheTime = cacheTime;
+
+        this.key = getMD5String(url);
     }
 
     /**
@@ -48,26 +60,31 @@ public class CacheManager {
         return md5Code;
     }
 
-    public String getCache(String key) {
-        key = getMD5String(key);
+    public String getCache() {
         String cache;
 
         //读取内存缓存
         String memCache = MemoryCache.getInstance().getCache(key);
-        if (memCache==null){//读取本地缓存
-            String diskCache = new DiskCache(context,cacheTime).getCache(key);
+        if (memCache == null) {//读取本地缓存
+            String diskCache = new DiskCache(this).getCache(key);
             cache = diskCache;
-        }else {
+        } else {
             cache = memCache;
         }
 
         return cache;
     }
 
-    public void setCache(String key, String cache) {
-        key = getMD5String(key);
-        MemoryCache.getInstance().setCache(key,cache);
-        new DiskCache(context,cacheTime).setCache(key,cache);
+    public void setCache(String cache) {
+        MemoryCache.getInstance().setCache(key, cache);
+        new DiskCache(this).setCache(key, cache);
     }
 
+    public boolean clearCache() {
+        return new DiskCache(this).clearCache(key) && MemoryCache.getInstance().clearCache(key);
+    }
+
+    public boolean clearAllCache() {
+        return new DiskCache(this).clearCache() && MemoryCache.getInstance().clearCache();
+    }
 }

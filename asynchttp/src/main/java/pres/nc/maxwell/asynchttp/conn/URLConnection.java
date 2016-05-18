@@ -10,7 +10,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 
 import pres.nc.maxwell.asynchttp.request.Request;
-import pres.nc.maxwell.asynchttp.utils.Constant;
+import pres.nc.maxwell.asynchttp.config.Constant;
 
 /**
  * URL连接管理

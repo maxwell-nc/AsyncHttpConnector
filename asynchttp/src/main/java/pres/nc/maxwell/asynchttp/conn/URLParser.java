@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import pres.nc.maxwell.asynchttp.request.Request;
-import pres.nc.maxwell.asynchttp.utils.Constant;
+import pres.nc.maxwell.asynchttp.config.Constant;
 
 public class URLParser {
 

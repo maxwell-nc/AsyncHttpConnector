@@ -24,6 +24,9 @@ public class CacheManager {
     private String key;
 
     public Context getContext() {
+        if (context == null){
+            throw new RuntimeException("必须先设置全局配置或使用有参数的cache方法！");
+        }
         return context;
     }
 

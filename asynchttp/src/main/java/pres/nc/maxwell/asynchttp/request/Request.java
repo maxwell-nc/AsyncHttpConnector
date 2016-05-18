@@ -21,7 +21,7 @@ public class Request implements Serializable {
     /**
      * 参数
      */
-    private HashMap<String, Object> params;
+    private HashMap<String, Object> params = new HashMap<>();
 
     /**
      * 请求方法，默认为GET
@@ -32,14 +32,14 @@ public class Request implements Serializable {
     private String requestMethod = Constant.METHOD_GET;
 
     /**
-     * 连接超时时间
+     * 连接超时时间,默认为10,000 ms
      */
-    private int connectTimeout = -1;
+    private int connectTimeout = 10000;
 
     /**
-     * 读取超时时间
+     * 读取超时时间,默认为15,000ms
      */
-    private int readTimeout = -1;
+    private int readTimeout = 15000;
 
     /**
      * 用户代理

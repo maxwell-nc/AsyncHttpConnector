@@ -1,12 +1,14 @@
 package pres.nc.maxwell.asynchttp;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.HashMap;
 
 import pres.nc.maxwell.asynchttp.cache.CacheManager;
 import pres.nc.maxwell.asynchttp.callback.ICallback;
 import pres.nc.maxwell.asynchttp.conn.ConnectTask;
+import pres.nc.maxwell.asynchttp.log.LogUtils;
 import pres.nc.maxwell.asynchttp.request.Request;
 import pres.nc.maxwell.asynchttp.thread.ThreadPoolController;
 
@@ -64,7 +66,7 @@ public class HttpConnector {
         }
 
         ConnectTask connectTask = new ConnectTask(mConnectBuilder.resultCallback, mConnectBuilder.request,
-                mConnectBuilder.logTag, mConnectBuilder.isCache, mConnectBuilder.context, mConnectBuilder.cacheTime, mConfigBuilder.isEnableNetwork);
+                mConnectBuilder.logTag, mConnectBuilder.isCache, mConnectBuilder.context, mConnectBuilder.cacheTime, mConfigBuilder == null || mConfigBuilder.isEnableNetwork);
         connectTask.executeOnExecutor(ThreadPoolController.getThreadPool());
     }
 
@@ -101,14 +103,22 @@ public class HttpConnector {
      * @return 是否成功
      */
     public static boolean clearCache(Context context, String url) {
-        return new CacheManager(context, url, -1).clearCache();
+        boolean result = new CacheManager(context, url, -1).clearCache();
+        LogUtils.log().priority(Log.INFO).tag("http cache")
+                .addMsg("clear cache :" + url)
+                .addMsg("clear cache :" + result).build().execute();
+        return result;
     }
 
     /**
      * 清理所有缓存
      */
     public static boolean clearCache(Context context) {
-        return new CacheManager(context, "", -1).clearAllCache();
+        boolean result = new CacheManager(context, "", -1).clearAllCache();
+        LogUtils.log().priority(Log.INFO).tag("http cache")
+                .addMsg("clear all cache")
+                .addMsg("clear all cache :" + result).build().execute();
+        return result;
     }
 
     /**
@@ -117,14 +127,14 @@ public class HttpConnector {
     public static class ConfigBuilder {
 
         /**
-         * 连接超时时间,默认为10,000 ms
+         * 连接超时时间
          */
-        int connectTimeout = 10000;
+        int connectTimeout = -1;
 
         /**
-         * 读取超时时间,默认为15,000ms
+         * 读取超时时间
          */
-        int readTimeout = 15000;
+        int readTimeout = -1;
 
         /**
          * 缓存时间，默认不缓存
@@ -252,13 +262,15 @@ public class HttpConnector {
         }
 
         /**
-         * 设置参数Map，注意此方法必须在{@link #addParams(String, Object)}之前调用，否则会丢失参数
+         * 设置参数Map
          */
         public ConnectBuilder setParams(HashMap<String, Object> params) {
             if (params == null)
                 return this;
 
-            request.setParams(params);
+            HashMap<String, Object> requestParams = request.getParams();
+            requestParams.putAll(params);
+            request.setParams(requestParams);//设置回去
             return this;
         }
 
@@ -271,9 +283,6 @@ public class HttpConnector {
          */
         public ConnectBuilder addParams(String key, Object value) {
             HashMap<String, Object> params = request.getParams();
-            if (params == null) {
-                params = new HashMap<>();
-            }
             params.put(key, value);
             request.setParams(params);//记得设置回去
             return this;

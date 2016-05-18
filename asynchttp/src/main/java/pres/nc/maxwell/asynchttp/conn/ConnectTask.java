@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.zip.GZIPInputStream;
@@ -94,7 +93,7 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
                 response.setResponseMsg("读取缓存成功！");
                 try {
                     response.setResponseData(resultCallback.parseResponseStream(new ByteArrayInputStream(cache.getBytes())));
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 return true;
@@ -124,8 +123,7 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
 
                 InputStream inputStream = urlConnection.getInputStream();
                 if ("gzip".equals(urlConnection.getContentEncoding())) {
-                    GZIPInputStream gzipStream = new GZIPInputStream(inputStream);
-                    inputStream = gzipStream;
+                    inputStream = new GZIPInputStream(inputStream);
                 }
                 // 调用监听器
                 if (resultCallback != null) {
@@ -197,6 +195,8 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
                 resultCallback.onFailure(response);
             }
 
+
+            resultCallback.onAfter(response);
         }
 
     }

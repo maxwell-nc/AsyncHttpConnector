@@ -82,6 +82,9 @@ public class URLConnection {
         // User-Agent
         connection.setRequestProperty("User-Agent", request.getUserAgent());
 
+        //支持gzip、deflate
+        connection.setRequestProperty("Accept-Encoding", "gzip,deflate");
+
         // 请求方法
         connection.setRequestMethod(request.getRequestMethod());
 

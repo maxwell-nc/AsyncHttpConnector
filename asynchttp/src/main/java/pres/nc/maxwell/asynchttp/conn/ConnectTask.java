@@ -7,6 +7,7 @@ import android.util.Log;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.zip.GZIPInputStream;
 
 import pres.nc.maxwell.asynchttp.cache.CacheManager;
 import pres.nc.maxwell.asynchttp.callback.ICallback;
@@ -117,7 +118,10 @@ public class ConnectTask extends AsyncTask<Void, Void, Boolean> {
             if (response.getResponseCode() == 200) {//成功接收
 
                 InputStream inputStream = urlConnection.getInputStream();
-
+                if ("gzip".equals(urlConnection.getContentEncoding())) {
+                    GZIPInputStream gzipStream = new GZIPInputStream(inputStream);
+                    inputStream = gzipStream;
+                }
                 // 调用监听器
                 if (resultCallback != null) {
                     response.setResponseMsg(urlConnection.getResponseMessage());
